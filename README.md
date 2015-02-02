@@ -14,3 +14,16 @@ This script generates a BIND zonefile from the Namecoin blockchain.
 4. Populate `nmczone.conf` with the user and password from `~/.namecoin/namecoin.conf`
 5. Add the authoritative nameserver and contact email in `nmczone.conf`
 6. Run the script `update.sh` via cron at an interval of your choice.
+
+### Supported Records
+
+From [Namecoin Domain Name Specification 2.0](http://wiki.namecoin.info/?title=Domain_Name_Specification_2.0)
+
+| Type      | Corresponding DNS Record  |
+|:---------:|:-------------------------:|
+| ip6 		| A							|
+| ip6 		| AAAA						|
+| alias 	| CNAME						|
+| translate	| DNAME						|
+| map		| 							|
+| ns		| NS						|
