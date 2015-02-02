@@ -4,8 +4,7 @@ This script generates a BIND zonefile from the Namecoin blockchain.
 
 ### Requirements
 - Running instance of Namecoin
-- jsonrpclib
-- - `pip install jsonrpclib`
+- jsonrpclib - `pip install jsonrpclib`
 
 ### Instructions
 1. Clone this repository into `/opt/nmczone/` or a path of your choice
