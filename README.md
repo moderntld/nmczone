@@ -32,7 +32,7 @@ From [Namecoin Domain Name Specification 2.0](http://wiki.namecoin.info/?title=D
 
 | Type      | Corresponding DNS Record  |
 |:---------:|:-------------------------:|
-| service 	| A							|
+| service 	| SRV						|
 | email 	| RP						|
 | loc 		| LOC						|
 | delegate	| 							|
