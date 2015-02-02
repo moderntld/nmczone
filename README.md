@@ -27,3 +27,14 @@ From [Namecoin Domain Name Specification 2.0](http://wiki.namecoin.info/?title=D
 | translate	| DNAME						|
 | map		| 							|
 | ns		| NS						|
+
+### To Do
+
+| Type      | Corresponding DNS Record  |
+|:---------:|:-------------------------:|
+| service 	| A							|
+| email 	| RP						|
+| loc 		| LOC						|
+| delegate	| 							|
+| import	| 							|
+| ds		| DS						|
