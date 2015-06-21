@@ -20,7 +20,7 @@ From [Namecoin Domain Name Specification 2.0](http://wiki.namecoin.info/?title=D
 
 | Type      | Corresponding DNS Record  |
 |:---------:|:-------------------------:|
-| ip 		| A							|
+| ip6 		| A							|
 | ip6 		| AAAA						|
 | alias 	| CNAME						|
 | translate	| DNAME						|

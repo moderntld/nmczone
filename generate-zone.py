@@ -16,11 +16,21 @@ def is_valid_ipv6(ip_addr):
 		return False
 
 def is_valid_domain(name):
-	if(re.match('^([a-zA-Z0-9._-]+\.)*[a-zA-Z0-9._-]+\.?$', name) and len(name) < 64):
+	if re.match('^([a-zA-Z0-9._-]+\.)*[a-zA-Z0-9._-]+\.?$', name) and len(name) < 64:
 		return True
 	else:
 		return False
 
+def is_valid_txt(txt):
+	if len(txt) < 255:
+		return True
+	else:
+		return False
+
+def make_valid_email(email):
+	email = email.replace('@', '.')
+	return make_fqdn(email)
+	
 def make_list(input_data):
 	if type(input_data) is list:
 		return input_data
@@ -37,7 +47,7 @@ def get_names(rpc_server):
 	names = []
 
 	for name in rpc.name_filter('^d/[a-z0-9_-]+$', 0):
-		if(not 'expired' in name):
+		if not 'expired' in name:
 			try:
 				name_data = {'name': name['name'][2:], 'json': json.loads(name['value'])}
 				names.append(name_data)
@@ -52,6 +62,7 @@ class ProcessJSON(object):
 	def __init__(self, domain, name_json):
 		self.cname = []
 		self.others = []
+		self.imports = []
 
 		self.process_name(domain, name_json)
 
@@ -78,17 +89,39 @@ class ProcessJSON(object):
 					for target in make_list(values):
 						if is_valid_domain(target):
 							self.others.append({'type': 'dname', 'domain': domain, 'target': make_fqdn(target)})
+				elif record_type == 'info':
+					for target in make_list(values):
+						if(is_valid_txt(target)):
+							self.others.append({'type': 'txt', 'domain': domain, 'target': json.dumps(target).replace('"', '\\"').encode('ascii', 'ignore')})
 				elif record_type == 'map':
 					for subdomain, value in values.items():
 						if subdomain:
 							newdomain = subdomain + '.' + domain
 						else:
 							newdomain = domain
+						# If value is simply and IPv4/6 address, the domain is probably using the old v1 spec.
+						if is_valid_ipv4(value):
+							value = { "ip": [value] }
+						elif is_valid_ipv6(value):
+							value = { "ip6": [value] }
 						self.process_name(newdomain, value)
-				elif record_type == 'service':
-					pass
+				elif record_type == 'import':
+					if type(values) == list:
+						for value in values:
+							if len(value) == 1:
+								self.imports.append({'import': value, 'domain': domain})
+							elif len(value) > 1:
+								self.imports.append({'import': value[0], 'domain': value[1]+'.'+domain})
+					elif type(values) == str:
+						self.imports.append({'import': values, 'domain': domain})
+				elif record_type == 'email':
+					for target in make_list(values):
+						clean_target = make_valid_email(target)
+						if clean_target:
+							self.others.append({'type': 'rp', 'domain': domain, 'target': clean_target})
 				elif record_type == 'loc':
-					pass
+					for target in make_list(values):
+						self.others.append({'type': 'loc', 'domain': domain, 'target': target.encode('ascii', 'ignore')})
 				elif record_type == 'ds':
 					pass
 		except AttributeError:
@@ -96,11 +129,10 @@ class ProcessJSON(object):
 
 def generate_zone(names):
 	cname_list = []
-
 	for name in names:
 		if name['json']:
 			records = ProcessJSON(name['name'], name['json'])
-			
+
 			for record in records.cname:
 				if record['domain'] not in cname_list:
 					cname_list.append(record['domain'])
@@ -121,10 +153,16 @@ def generate_zone(names):
 						yield record['domain'] + ' IN NS ' + record['target']
 				if record['type'] == 'loc':
 					if record['domain'] not in cname_list:
-						yield record['domain'] + ' IN LOC ' + record['target']
+						yield record['domain'] + ' IN LOC "' + record['target']+'"'
 				if record['type'] == 'ds':
 					if record['domain'] not in cname_list:
 						yield record['domain'] + ' IN DS ' + record['target']
+				if record['type'] == 'txt':
+					if record['domain'] not in cname_list:
+						yield record['domain'] + ' IN TXT "' + record['target']+'"'
+				if record['type'] == 'rp':
+					if record['domain'] not in cname_list:
+						yield record['domain'] + ' IN RP ' + record['target']
 
 def main():
 	try:
@@ -135,7 +173,7 @@ def main():
 		block_count = config.get('nmczone', 'block_count')
 		serial_multiplier = config.get('nmczone', 'serial_multiplier')
 	except:
-		print "Invalid config file."
+		print("Invalid config file.")
 		exit()
 
 	names_data = get_names(json_rpc)
@@ -143,11 +181,13 @@ def main():
 	with open("zone-template.conf", 'r') as f:
 		template = f.read()
 
+	generate_zone(names_data['names'])
+
 	with open(zonefile, 'w') as f:
 		serial = str(names_data['block']*int(serial_multiplier))
 		f.write(template.replace('%%serial%%', serial))
 		for record in generate_zone(names_data['names']):
-			f.write('\n'+record)
+			f.write('\n'+record.encode('utf8'))
 		f.write('\n')
 
 	with open(block_count, 'w') as f:
