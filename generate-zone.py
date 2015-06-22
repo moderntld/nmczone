@@ -60,7 +60,8 @@ class ProcessJSON(object):
 		self.others = []
 		self.imports = []
 
-		self.process_name(domain, name_json)
+		if is_valid_domain(domain):
+			self.process_name(domain, name_json)
 
 	def process_name(self, domain, name_json):
 		try:
