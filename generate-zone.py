@@ -5,14 +5,14 @@ def is_valid_ipv4(ip_addr):
 	try:
 		socket.inet_pton(socket.AF_INET, ip_addr)
 		return True
-	except socket.error:
+	except:
 		return False
 
 def is_valid_ipv6(ip_addr):
 	try:
 		socket.inet_pton(socket.AF_INET6, ip_addr)
 		return True
-	except socket.error:
+	except:
 		return False
 
 def is_valid_domain(name):
