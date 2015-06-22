@@ -25,7 +25,6 @@ From [Namecoin Domain Name Specification 2.0](http://wiki.namecoin.info/?title=D
 | alias 	| CNAME						|
 | translate	| DNAME						|
 | ns		| NS						|
-| loc 		| LOC						|
 | map		| 							|
 
 ### To Do
@@ -36,3 +35,4 @@ From [Namecoin Domain Name Specification 2.0](http://wiki.namecoin.info/?title=D
 | delegate	| 							|
 | import	| 							|
 | ds		| DS						|
+| loc 		| LOC						|

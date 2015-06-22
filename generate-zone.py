@@ -112,11 +112,6 @@ class ProcessJSON(object):
 								self.imports.append({'import': value[0], 'domain': value[1]+'.'+domain})
 					elif type(values) == str:
 						self.imports.append({'import': values, 'domain': domain})
-				elif record_type == 'loc':
-					for target in make_list(values):
-						self.others.append({'type': 'loc', 'domain': domain, 'target': target.encode('ascii', 'ignore')})
-				elif record_type == 'ds':
-					pass
 		except AttributeError:
 			pass
 
@@ -144,12 +139,6 @@ def generate_zone(names):
 				if record['type'] == 'ns':
 					if record['domain'] not in cname_list:
 						yield record['domain'] + ' IN NS ' + record['target']
-				if record['type'] == 'loc':
-					if record['domain'] not in cname_list:
-						yield record['domain'] + ' IN LOC "' + record['target']+'"'
-				if record['type'] == 'ds':
-					if record['domain'] not in cname_list:
-						yield record['domain'] + ' IN DS ' + record['target']
 				if record['type'] == 'txt':
 					if record['domain'] not in cname_list:
 						yield record['domain'] + ' IN TXT "' + record['target']+'"'
