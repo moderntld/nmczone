@@ -26,10 +26,6 @@ def is_valid_txt(txt):
 		return True
 	else:
 		return False
-
-def make_valid_email(email):
-	email = email.replace('@', '.')
-	return make_fqdn(email)
 	
 def make_list(input_data):
 	if type(input_data) is list:
@@ -114,11 +110,6 @@ class ProcessJSON(object):
 								self.imports.append({'import': value[0], 'domain': value[1]+'.'+domain})
 					elif type(values) == str:
 						self.imports.append({'import': values, 'domain': domain})
-				elif record_type == 'email':
-					for target in make_list(values):
-						clean_target = make_valid_email(target)
-						if clean_target:
-							self.others.append({'type': 'rp', 'domain': domain, 'target': clean_target})
 				elif record_type == 'loc':
 					for target in make_list(values):
 						self.others.append({'type': 'loc', 'domain': domain, 'target': target.encode('ascii', 'ignore')})
@@ -160,9 +151,6 @@ def generate_zone(names):
 				if record['type'] == 'txt':
 					if record['domain'] not in cname_list:
 						yield record['domain'] + ' IN TXT "' + record['target']+'"'
-				if record['type'] == 'rp':
-					if record['domain'] not in cname_list:
-						yield record['domain'] + ' IN RP ' + record['target']
 
 def main():
 	try:

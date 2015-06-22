@@ -25,7 +25,6 @@ From [Namecoin Domain Name Specification 2.0](http://wiki.namecoin.info/?title=D
 | alias 	| CNAME						|
 | translate	| DNAME						|
 | ns		| NS						|
-| email 	| RP						|
 | loc 		| LOC						|
 | map		| 							|
 
