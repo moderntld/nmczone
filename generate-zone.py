@@ -60,7 +60,7 @@ class ProcessJSON(object):
 		self.others = []
 		self.imports = []
 
-		if is_valid_domain(domain):
+		if is_valid_domain(domain) or domain == '*':
 			self.process_name(domain, name_json)
 
 	def process_name(self, domain, name_json):
@@ -101,7 +101,7 @@ class ProcessJSON(object):
 							value = { "ip": [value] }
 						elif is_valid_ipv6(value):
 							value = { "ip6": [value] }
-						if is_valid_domain(newdomain):
+						if is_valid_domain(newdomain) or (newdomain == '*.'+domain and is_valid_domain(domain)):
 							self.process_name(newdomain, value)
 				elif record_type == 'import':
 					if type(values) == list:
