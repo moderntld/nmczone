@@ -17,7 +17,7 @@ def is_valid_ipv6(ip_addr):
 
 def is_valid_domain(name):
 	try:
-		if re.match('^([a-zA-Z0-9._-]+\.)*[a-zA-Z0-9._-]+\.?$', name) and len(name) < 64 and name[:1].isalnum():
+		if re.match('^([a-zA-Z0-9]+([-.][a-zA-Z0-9]+)*\.)*[a-zA-Z]+([-.]+[a-zA-Z0-9]+)*\.?$', name) and len(name) < 64 and name[:1].isalnum():
 			return True
 		else:
 			return False
@@ -26,11 +26,11 @@ def is_valid_domain(name):
 		return False
 
 def is_valid_txt(txt):
-	if len(txt) < 255:
+	if len(txt) < 250:
 		return True
 	else:
 		return False
-	
+
 def make_list(input_data):
 	if type(input_data) is list:
 		return input_data
@@ -90,10 +90,10 @@ class ProcessJSON(object):
 					for target in make_list(values):
 						if is_valid_domain(target):
 							self.others.append({'type': 'dname', 'domain': domain, 'target': make_fqdn(target)})
-				elif record_type == 'info':
-					for target in make_list(values):
-						if(is_valid_txt(target)):
-							self.others.append({'type': 'txt', 'domain': domain, 'target': json.dumps(target).replace('"', '\\"').encode('ascii', 'ignore')})
+#				elif record_type == 'info':
+#					for target in make_list(values):
+#						if(is_valid_txt(target)):
+#							self.others.append({'type': 'txt', 'domain': domain, 'target': json.dumps(target).replace('"', '\\"').encode('ascii', 'ignore')})
 				elif record_type == 'map':
 					for subdomain, value in values.items():
 						if subdomain:
@@ -150,7 +150,7 @@ def generate_zone(names):
 def main():
 	try:
 		config = ConfigParser.ConfigParser()
-		config.read("nmczone.conf")
+		config.read("/opt/nmczone/nmczone.conf")
 		json_rpc = config.get('nmczone', 'json_rpc')
 		zonefile = config.get('nmczone', 'zonefile')
 		block_count = config.get('nmczone', 'block_count')
@@ -161,7 +161,7 @@ def main():
 
 	names_data = get_names(json_rpc)
 
-	with open("zone-template.conf", 'r') as f:
+	with open("/opt/nmczone/zone-template.conf", 'r') as f:
 		template = f.read()
 
 	generate_zone(names_data['names'])
