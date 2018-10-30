@@ -17,7 +17,7 @@ def is_valid_ipv6(ip_addr):
 
 def is_valid_domain(name):
 	try:
-		if re.match('^([a-zA-Z0-9]+([-.][a-zA-Z0-9]+)*\.)*[a-zA-Z]+([-.]+[a-zA-Z0-9]+)*\.?$', name) and len(name) < 64 and name[:1].isalnum():
+		if (re.match('^([a-zA-Z0-9-_]+\.)*[a-zA-Z0-9][a-zA-Z0-9-_]+\.?$', name) or re.match('^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}', name)) and len(name) < 64 and name[:1].isalnum():
 			return True
 		else:
 			return False
